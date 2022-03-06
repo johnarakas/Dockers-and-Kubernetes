@@ -81,7 +81,23 @@ The alpine is much smaller from nginx I believe this is because alpine is design
 ` docker run -d  --name johnginx -p 80:80 nginx:1.21.6 `
 
 ### c.
-The changes are gone because this is a fresh image nothing has been saved.
+The changes are gone because this is a fresh image nothing has been saved from the old image.
+
+## 3
+
+`git clone --recurse-submodules https://github.com/chazapis/hy548.git`
+
+`cd hy548/html`
+
+`hugo -D`
+
+`cd ..`
+
+`docker cp public/. johnginx:/usr/share/nginx/html/ `
+
+![3_hy548_index_html](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/3_hy548_index_html.png)
+
+
 
 
 
