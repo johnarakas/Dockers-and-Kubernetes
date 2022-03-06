@@ -50,3 +50,39 @@ The alpine is much smaller from nginx I believe this is because alpine is design
 
 `docker rm johnginx`
 
+## 2.
+
+### a.
+
+` docker run -d  --name johnginx -p 80:80 nginx:1.21.6 `
+
+` docker exec -it johnginx bash `
+
+` apt-get update `
+` apt-get install nano`
+
+` cd /usr/share/nginx/html`
+
+![myindex_html](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/2a_myindex_html.png)
+
+### b. 
+
+`curl localhost:80 > index.html`
+
+`cp test.html johnginx:/usr/share/nginx/html/index.html`
+
+![2b_newindex_html](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/2b_newindex_html.png)
+
+
+`docker stop johnginx`
+
+`docker rm johnginx`
+
+` docker run -d  --name johnginx -p 80:80 nginx:1.21.6 `
+
+### c.
+The changes are gone because this is a fresh image nothing has been saved.
+
+
+
+
