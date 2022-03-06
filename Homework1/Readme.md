@@ -21,19 +21,19 @@ The alpine is much smaller from nginx I believe this is because alpine is design
 
 `curl localhost:80 `
 
-![nginx_index_html](1c_index_html.png)
+![nginx_index_html](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/1c_index_html.png)
 
 ### d.
 
 `docker ps`
 
-![docker_ps](1d_docker_ps.png)
+![docker_ps](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/1d_docker_ps.png)
 
 ### e.
 
 `docker container logs johnginx`
 
-![container_logs](1e_container_logs.png)
+![container_logs](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/1e_container_logs.png)
 
 ### f.
 
