@@ -21,19 +21,19 @@ The alpine is much smaller from nginx I believe this is because alpine is design
 
 `curl localhost:80 `
 
-![nginx_index_html](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/1c_index_html.png)
+![nginx_index_html](Assets/1c_index_html.png)
 
 ### d.
 
 `docker ps`
 
-![docker_ps](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/1d_docker_ps.png)
+![docker_ps](Assets/1d_docker_ps.png)
 
 ### e.
 
 `docker container logs johnginx`
 
-![container_logs](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/1e_container_logs.png)
+![container_logs](Assets/1e_container_logs.png)
 
 ### f.
 
@@ -63,7 +63,7 @@ The alpine is much smaller from nginx I believe this is because alpine is design
 
 ` cd /usr/share/nginx/html`
 
-![myindex_html](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/2a_myindex_html.png)
+![myindex_html](Assets/2a_myindex_html.png)
 
 ### b. 
 
@@ -71,7 +71,7 @@ The alpine is much smaller from nginx I believe this is because alpine is design
 
 `cp test.html johnginx:/usr/share/nginx/html/index.html`
 
-![2b_newindex_html](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/2b_newindex_html.png)
+![2b_newindex_html](Assets/2b_newindex_html.png)
 
 
 `docker stop johnginx`
@@ -95,7 +95,7 @@ The changes are gone because this is a fresh image nothing has been saved from t
 
 `docker cp public/. johnginx:/usr/share/nginx/html/ `
 
-![3_hy548_index_html](https://github.com/johnarakas/CS-548/tree/main/Homework1/Assets/3_hy548_index_html.png)
+![3_hy548_index_html](Assets/3_hy548_index_html.png)
 
 
 
