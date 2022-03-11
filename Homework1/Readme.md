@@ -101,9 +101,7 @@ The changes are gone because this is a fresh image nothing has been saved from t
 ## 4
 
 ` docker run -d  --name john -p 80:80 nginx:1.21.6 `
-
-Original Size: 1.12kB
-New size: 154MB
+### a
 
 ` cd /usr/share/nginx/html `
 
@@ -125,11 +123,13 @@ New size: 154MB
 
 `rm -rf hy548 `
 
-OR with the docker file we can do
+With the docker file we can do
 
 `docker build -t "hy548:csdp1235" . `
 `docker run -d  --name john -p 80:80 hy548:csdp1235`
 
+
+### b
 To upload my image I did
 
 `docker container commit d884cf8f11c2 johnarakas/hy548`
@@ -139,6 +139,17 @@ To upload my image I did
 To pull
 
 `docker pull johnarakas/hy548:latest`
+
+
+### c
+I use nginx:1.21.6 is realy small and ready to use for websites
+
+Original Size: 1.12kB
+
+New size: 154MB
+
+### d
+I delte the repo tha I clone keeping only the files on public I could also delete the installations packets of hugo and git but I wasn't able to do so
 
 
 
