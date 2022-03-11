@@ -98,6 +98,53 @@ The changes are gone because this is a fresh image nothing has been saved from t
 ![3_hy548_index_html](Assets/3_hy548_index_html.png)
 
 
+## 4
+
+` docker run -d  --name john -p 80:80 nginx:1.21.6 `
+
+Original Size: 1.12kB
+New size: 154MB
+
+` cd /usr/share/nginx/html `
+
+`apt-get update `
+
+`apt-get install hugo `
+
+`apt-get install git`
+
+`git clone --recurse-submodules https://github.com/chazapis/hy548.git `
+
+`cd hy548/html/ `
+
+`hugo -D`
+
+`mv public/* /usr/share/nginx/html/.`
+
+`cd ../../`
+
+`rm -rf hy548 `
+
+OR with the docker file we can do
+
+`docker build -t "hy548:csdp1235" . `
+`docker run -d  --name john -p 80:80 hy548:csdp1235`
+
+To upload my image I did
+
+`docker container commit d884cf8f11c2 johnarakas/hy548`
+
+`docker image push johnarakas/hy548`
+
+To pull
+
+`docker pull johnarakas/hy548:latest`
+
+
+
+
+
+
 
 
 
