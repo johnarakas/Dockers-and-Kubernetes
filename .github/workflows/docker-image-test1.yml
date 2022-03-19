@@ -1,0 +1,46 @@
+name: Build and Publish
+
+on:
+  # run it on push to the default repository branch
+  push:
+    branches: [main]
+  # run it during pull request
+  pull_request:
+
+jobs:
+  # define job to build and publish docker image 
+    build:
+      name: Build Docker image and push to repositories
+      runs-on: nginx:1.21.6
+
+      steps:
+
+
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+
+        # setup Docker buld action
+        - name: Set up Docker Buildx
+          id: buildx
+          uses: docker/setup-buildx-action@v1
+
+
+        - name: Login to DockerHub
+          uses: docker/login-action@v1
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+
+
+        - name: Build image
+          uses: docker/build-push-action@v2
+          with:
+            file: ./Homework1/Dockerfile
+        
+        - name: Push image
+          uses: docker/build-push-action@v2
+          with:
+            push: true
+            
