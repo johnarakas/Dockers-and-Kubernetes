@@ -152,6 +152,9 @@ New size: 154MB
 I delte the repo tha I clone keeping only the files on public I could also delete the installations packets of hugo and git but I wasn't able to do so
 
 
+## 5
+
+You can find yam on workflows
 
 
 
