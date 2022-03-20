@@ -38,8 +38,7 @@ jobs:
            
             context: ./Homework1
             # Note: tags has to be all lower-case
-            tags: |
-              johnarakas/hy548:latest 
+            tags: johnarakas/hy548:latest 
             # build on feature branches, push only on main branch
             push: ${{ github.ref == 'refs/heads/main' }}
 
