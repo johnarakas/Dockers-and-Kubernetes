@@ -8,13 +8,12 @@ on:
   pull_request:
 
 jobs:
-  # define job to build and publish docker image 
-    build:
-      name: Build Docker image and push to repositories
+  # define job to build and publish docker image
+  build-and-push-docker-image:
+      name: Buildand push to  Docker image 
       runs-on: nginx:1.21.6
 
       steps:
-
 
         - name: Checkout code
           uses: actions/checkout@v2
@@ -31,16 +30,20 @@ jobs:
           with:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-
-
-        - name: Build image
-          uses: docker/build-push-action@v2
-          with:
-            file: ./Homework1/Dockerfile
-        
-        - name: Push image
-          uses: docker/build-push-action@v2
-          with:
-            push: true
             
+            
+        - name: Build and Push
+          uses: docker/build-push-action@v2
+          with:
+           
+            context: ./Homework1
+            # Note: tags has to be all lower-case
+            tags: |
+              johnarakas/hy548:latest 
+            # build on feature branches, push only on main branch
+            push: ${{ github.ref == 'refs/heads/main' }}
+
+        - name: Image digest
+          run: echo ${{ steps.docker_build.outputs.digest }}
+
+
