@@ -33,13 +33,14 @@ To start the pod: `kubectl apply -f Homework2_1.yaml`
 
 ### 1 b.
 To forward the pod to port 80: `kubectl port-forward demo 80:80`
+
 To copy the nginx default page: `curl localhost:80 > index.html`
 
 ### 1 c.
 
 To print the logs: `kubectl logs demo`
 
-### 1
+### 1 d.
 
 To open a session: `kubectl exec -it demo -- /bin/sh `
 
@@ -64,7 +65,7 @@ To place hello.html as default page: `kubectl cp hello.html demo:/usr/share/ngin
 
 ![My new Homepage](Assets/1_e_newIndex.png)
 
-### 1d.
+### 1f.
 
 To stop and delete ` kubectl delete pod demo`
 
