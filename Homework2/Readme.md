@@ -67,7 +67,88 @@ To place hello.html as default page: `kubectl cp hello.html demo:/usr/share/ngin
 
 ### 1f.
 
-To stop and delete ` kubectl delete pod demo`
+To stop and delete `kubectl delete -f  demo `
 
 
+## 2
 
+To do this assgnment I use two files my yaml and one bash script file. My yaml file create one job and while using using a config map that contains my script.
+
+My Script :
+
+```
+#!/bin/bash
+apt-get update
+
+apt-get install git -y
+
+apt-get install curl -y
+
+cd ../
+
+git clone --recurse-submodules https://github.com/chazapis/hy548.git
+
+
+curl -L https://github.com/gohugoio/hugo/releases/download/v0.96.0/hugo_0.96.0_Linux-64bit.deb  -o hugo.deb
+
+
+apt install ./hugo.deb
+
+hugo version
+ 
+
+cd  hy548
+
+cd html
+
+hugo -D
+
+ls -l
+
+
+```
+My yaml
+
+```
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: john1
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: ubuntu
+        image: ubuntu:20.04
+        
+        
+        
+        args:
+        - "./scripts/wrapper.sh"
+
+
+        volumeMounts:
+        - name: wrapper
+          mountPath: /scripts
+
+      volumes:
+      - name: wrapper
+        configMap:
+          name: wrapper
+          defaultMode: 0777
+```
+
+To create a configmap I run:
+
+`kubectl create configmap wrapper --from-file=wrapper.sh`
+
+To run my yaml I run
+
+`kubectl apply -f Homework2_2.yaml`
+
+To check that everything was ok I first run `kubectl get pods` to see if my pod crashed then I check the logs for the expected ouputs by runing :
+
+`kubectl logs my_pods_name `
+
+## 3
