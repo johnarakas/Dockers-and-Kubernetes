@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ubuntu-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+
+  - name: nginx
+    image: nginx:1.21.6
+    ports:
+    - containerPort: 80
+      name: http
+      protocol: TCP
+
+    volumeMounts:
+    - mountPath: /usr/share/nginx/html
+      name: ubuntu-volume
+  volumes:
+  - name: ubuntu-volume
+    persistentVolumeClaim:
+      claimName: ubuntu-pvc
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: job-repeating
+spec:
+  schedule: "15 2 * * *" # Run every minute
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: ubuntu
+            image: ubuntu:20.04
+            ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP        
+            args:
+            - "./scripts/script.sh"
+
+            volumeMounts:
+            - name: wrapper1
+              mountPath: /scripts
+            - mountPath: /usr/share/nginx/html
+              name: ubuntu-volume
+          volumes:
+          - name: ubuntu-volume
+            persistentVolumeClaim:
+              claimName: ubuntu-pvc
+          - name: wrapper1
+            configMap:
+              name: wrapper1
+              defaultMode: 0777
+

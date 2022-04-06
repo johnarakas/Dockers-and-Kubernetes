@@ -156,3 +156,9 @@ To check if the job finshed I run :
 `kubectl get jobs`
 
 ## 3
+
+  I create a persistent volume on path /ush/share/nginx/ so my pods can comunicate. 
+  
+  Then I create an nginx pod that serves the content of /ush/share/nginx/html/
+
+  Finaly my ubuntu pod created by cronjob clones the github repo the compile the conntent of /hy548/html/public and check if is the same as /ush/share/nginx/html/public if so it does nothing if the files are difrent overites the existing files with the content of /hy548/html/public.
