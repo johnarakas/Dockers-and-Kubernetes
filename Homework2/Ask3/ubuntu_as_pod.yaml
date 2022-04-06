@@ -14,27 +14,16 @@ spec:
     - "./scripts/script.sh"
 
     volumeMounts:
-    - name: cache-volume
-      mountPath: /usr/share/nginx/html
     - name: wrapper1
       mountPath: /scripts
-
-
-  - name: nginx
-    image: nginx:1.21.6-alpine
-    ports:
-    - containerPort: 80
-      name: http
-      protocol: TCP
-
-    volumeMounts:
     - mountPath: /usr/share/nginx/html
-      name: cache-volume
+      name: ubuntu-volume
   volumes:
-  - name: cache-volume
+  - name: ubuntu-volume
+    persistentVolumeClaim:
+      claimName: ubuntu-pvc
   - name: wrapper1
     configMap:
       name: wrapper1
       defaultMode: 0777
 
-    # emptyDir: {}
