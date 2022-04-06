@@ -10,6 +10,10 @@ spec:
       - name: ubuntu
         image: ubuntu:20.04
         
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
         
         
         args:

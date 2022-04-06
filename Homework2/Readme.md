@@ -50,7 +50,7 @@ To install nano so you can edit index.html:
 
 `apk add nano`
 
-To chande index.html: ` nano /usr/share/nginx/htmlindex.html`
+To chande index.html: ` nano /usr/share/nginx/html/index.html`
 
 
 ![My Nginx Homepage](Assets/1_d_MyNginx.html.png)
@@ -89,14 +89,13 @@ cd ../
 git clone --recurse-submodules https://github.com/chazapis/hy548.git
 
 
-curl -L https://github.com/gohugoio/hugo/releases/download/v0.96.0/hugo_0.96.0_Linux-64bit.deb  -o hugo.deb
+curl -L https://github.com/gohugoio/hugo/releases/download/v0.96.0/hugo_extended_0.96.0_Linux-64bit.deb -o hugo.deb
 
 
 apt install ./hugo.deb
 
 hugo version
  
-
 cd  hy548
 
 cd html
@@ -105,6 +104,7 @@ hugo -D
 
 ls -l
 
+sleep infinity
 
 ```
 My yaml
@@ -150,5 +150,9 @@ To run my yaml I run
 To check that everything was ok I first run `kubectl get pods` to see if my pod crashed then I check the logs for the expected ouputs by runing :
 
 `kubectl logs my_pods_name `
+
+To check if the job finshed I run :
+
+`kubectl get jobs`
 
 ## 3
