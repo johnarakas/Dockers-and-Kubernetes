@@ -74,46 +74,37 @@ To stop and delete `kubectl delete -f  demo `
 
 To do this assgnment I use two files my yaml and one bash script file. My yaml file create one job and while using using a config map that contains my script.
 
-My Script :
-
-```
-#!/bin/bash
-apt-get update
-
-apt-get install git -y
-
-apt-get install curl -y
-
-cd ../
-
-git clone --recurse-submodules https://github.com/chazapis/hy548.git
-
-
-curl -L https://github.com/gohugoio/hugo/releases/download/v0.96.0/hugo_extended_0.96.0_Linux-64bit.deb -o hugo.deb
-
-
-apt install ./hugo.deb
-
-hugo version
- 
-cd  hy548
-
-cd html
-
-hugo -D
-
-ls -l
-
-sleep infinity
-
-```
 My yaml
 
 ```
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: script-volume
+data:
+  script.sh: |
+    #!/bin/bash
+    apt-get update
+    apt-get install git -y
+    apt-get install curl -y
+    cd ../
+    git clone --recurse-submodules https://github.com/chazapis/hy548.git
+    curl -L https://github.com/gohugoio/hugo/releases/download/v0.96.0/hugo_extended_0.96.0_Linux-64bit.deb -o hugo.deb
+    apt install ./hugo.deb
+    hugo version 
+    cd  hy548
+    cd html
+    hugo -D
+    ls -l
+    # sleep infinity
+
+---
+
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: john1
+  name: ask2
 spec:
   template:
     spec:
@@ -122,30 +113,30 @@ spec:
       - name: ubuntu
         image: ubuntu:20.04
         
-        
-        
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+
         args:
-        - "./scripts/wrapper.sh"
+        - "./scripts/script.sh"
 
 
         volumeMounts:
-        - name: wrapper
+        - name: script-volume
           mountPath: /scripts
 
       volumes:
-      - name: wrapper
+      - name: script-volume
         configMap:
-          name: wrapper
+          name: script-volume
           defaultMode: 0777
 ```
 
-To create a configmap I run:
-
-`kubectl create configmap wrapper --from-file=wrapper.sh`
 
 To run my yaml I run
 
-`kubectl apply -f Homework2_2.yaml`
+`kubectl apply -f ask2.yaml`
 
 To check that everything was ok I first run `kubectl get pods` to see if my pod crashed then I check the logs for the expected ouputs by runing :
 
@@ -162,3 +153,35 @@ To check if the job finshed I run :
   Then I create an nginx pod that serves the content of /ush/share/nginx/html/
 
   Finaly my ubuntu pod created by cronjob clones the github repo the compile the conntent of /hy548/html/public and check if is the same as /ush/share/nginx/html/public if so it does nothing if the files are difrent overites the existing files with the content of /hy548/html/public.
+
+
+
+### 4
+
+```
+ while true
+    do
+      sleep 5
+
+      DIR="/scripts1"
+      
+
+      if [ -d "$DIR" ]
+      then
+        echo "folder"
+        if [ "  $(ls -A $DIR)"  ]; 
+        then
+          echo "Not empty"
+          
+          break
+        else 
+          ls -l scripts1/
+          echo "$DIR is Empty"
+        fi
+      else
+        echo "Directory $DIR not found."
+      fi
+      
+    done
+
+```

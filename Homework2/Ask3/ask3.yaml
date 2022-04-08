@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: script-volume
+data:
+  script.sh: |
+    #!/bin/bash
+    apt-get update
+    apt-get install git -y
+    apt-get install curl -y
+    cd ../
+    git clone --recurse-submodules https://github.com/chazapis/hy548
+    curl -L https://github.com/gohugoio/hugo/releases/download/v0.96.0/hugo_extended_0.96.0_Linux-64bit.deb -o hugo.deb
+    apt install ./hugo.deb
+    hugo version
+    cd  hy548
+    cd html
+    hugo -D
+    diff -q public/  /usr/share/nginx/html/ 1>/dev/null
+    if [[ $? == "0" ]]
+    then
+      echo "The same"
+    else
+      echo "Not the same"
+      cp -r public/. /usr/share/nginx/html/
+    fi
+    ls -l
+    # sleep infinity
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ubuntu-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+
+  - name: nginx
+    image: nginx:1.21.6
+    ports:
+    - containerPort: 80
+      name: http
+      protocol: TCP
+
+    volumeMounts:
+    - mountPath: /usr/share/nginx/html
+      name: ubuntu-volume
+  volumes:
+  - name: ubuntu-volume
+    persistentVolumeClaim:
+      claimName: ubuntu-pvc
+
+---
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ask3
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: ubuntu
+        image: ubuntu:20.04     
+        args:
+        - "./scripts/script.sh"
+
+        volumeMounts:
+        - name: ubuntu-volume
+          mountPath: /usr/share/nginx/html
+
+
+        - name: script-volume
+          mountPath: /scripts
+
+      volumes:
+      - name: ubuntu-volume
+        persistentVolumeClaim:
+          claimName: ubuntu-pvc
+      - name: script-volume
+        configMap:
+          name: script-volume
+          defaultMode: 0777
