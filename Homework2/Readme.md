@@ -158,30 +158,374 @@ To check if the job finshed I run :
 
 ### 4
 
-```
- while true
+  When the building of the project has finished I copy to it to /usr/share/nginx/html. My init container periodically check if index.html exist and if so terminates and the nginx start.
+
+  
+  And here is my final yaml 
+
+  Without Cronjob:
+  ```
+  apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ubuntu-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginxapp
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: nginxapp
+
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: script-volume
+data:
+  check.sh:  |
+    #!/bin/bash   
+
+    cd /usr/share/nginx/html
+
+    while true
     do
-      sleep 5
-
-      DIR="/scripts1"
+      sleep 10
       
-
-      if [ -d "$DIR" ]
+      if [[ -f index.html ]]
       then
-        echo "folder"
-        if [ "  $(ls -A $DIR)"  ]; 
-        then
-          echo "Not empty"
-          
-          break
-        else 
-          ls -l scripts1/
-          echo "$DIR is Empty"
-        fi
+        echo "index is exist!"
+        break;
       else
-        echo "Directory $DIR not found."
+        echo "index is not exist!"
       fi
-      
-    done
 
-```
+        
+    done
+    # sleep infinity
+  script.sh: |
+    #!/bin/bash
+
+    rm -rfv /usr/share/nginx/html/*
+
+    apt-get update
+    apt-get install git -y
+    apt-get install curl -y
+    cd ../
+    git clone --recurse-submodules https://github.com/chazapis/hy548
+    curl -L https://github.com/gohugoio/hugo/releases/download/v0.96.0/hugo_extended_0.96.0_Linux-64bit.deb -o hugo.deb
+    apt install ./hugo.deb
+    hugo version
+
+
+  
+    cd  hy548
+    cd html
+    hugo -D
+    diff -q public/  /usr/share/nginx/html/ 1>/dev/null
+
+
+    if [[ $? == "0" ]]
+    then
+      echo "The same"
+    else
+      echo "Not the same"
+      cp -r public/. /usr/share/nginx/html/
+    fi
+
+
+
+
+
+    # sleep infinity
+
+
+---
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ask4
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: ubuntu
+        image: ubuntu:20.04     
+        args:
+        - "./scripts/script.sh"
+
+        volumeMounts:
+        - name: ubuntu-volume
+          mountPath: /usr/share/nginx/html
+
+
+        - name: script-volume
+          mountPath: /scripts
+
+      volumes:
+      - name: ubuntu-volume
+        persistentVolumeClaim:
+          claimName: ubuntu-pvc
+      - name: script-volume
+        configMap:
+          name: script-volume
+          defaultMode: 0777
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21.6
+  
+        volumeMounts:
+        - name: ubuntu-volume
+          mountPath: /usr/share/nginx/html
+          
+
+      initContainers:
+      - name: ubuntu
+        image: ubuntu:20.04     
+        args:
+        - "./scripts/check.sh"
+
+        volumeMounts:
+        - name: ubuntu-volume
+          mountPath: /usr/share/nginx/html
+
+        
+        - name: script-volume
+          mountPath: /scripts
+          
+
+
+      volumes:
+      - name: ubuntu-volume
+        persistentVolumeClaim:
+          claimName: ubuntu-pvc
+
+      - name: script-volume
+        configMap:
+          name: script-volume
+          defaultMode: 0777
+
+
+
+
+  ```
+
+
+
+  with cronjob:
+
+  ```
+  apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ubuntu-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginxapp
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: nginxapp
+
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: script-volume
+data:
+  check.sh:  |
+    #!/bin/bash   
+
+    cd /usr/share/nginx/html
+
+    while true
+    do
+      sleep 10
+      
+      if [[ -f index.html ]]
+      then
+        echo "index is exist!"
+        break;
+      else
+        echo "index is not exist!"
+      fi
+
+        
+    done
+    # sleep infinity
+  script.sh: |
+    #!/bin/bash
+
+    rm -rfv /usr/share/nginx/html/*
+
+    apt-get update
+    apt-get install git -y
+    apt-get install curl -y
+    cd ../
+    git clone --recurse-submodules https://github.com/chazapis/hy548
+    curl -L https://github.com/gohugoio/hugo/releases/download/v0.96.0/hugo_extended_0.96.0_Linux-64bit.deb -o hugo.deb
+    apt install ./hugo.deb
+    hugo version
+
+
+  
+    cd  hy548
+    cd html
+    hugo -D
+    diff -q public/  /usr/share/nginx/html/ 1>/dev/null
+
+
+    if [[ $? == "0" ]]
+    then
+      echo "The same"
+    else
+      echo "Not the same"
+      cp -r public/. /usr/share/nginx/html/
+    fi
+
+
+
+
+
+    # sleep infinity
+
+
+---
+
+
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: job-repeating
+spec:
+  schedule: "15 2 * * *" 
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure              
+          containers:
+          - name: ubuntu
+            image: ubuntu:20.04     
+            args:
+            - "./scripts/script.sh"
+
+            volumeMounts:
+            - name: ubuntu-volume
+              mountPath: /usr/share/nginx/html
+
+
+            - name: script-volume
+              mountPath: /scripts
+
+          volumes:
+          - name: ubuntu-volume
+            persistentVolumeClaim:
+              claimName: ubuntu-pvc
+          - name: script-volume
+            configMap:
+              name: script-volume
+              defaultMode: 0777
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginxapp
+  template:
+    metadata:
+      labels:
+        app: nginxapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21.6
+  
+        volumeMounts:
+        - name: ubuntu-volume
+          mountPath: /usr/share/nginx/html
+          
+
+      initContainers:
+      - name: ubuntu
+        image: ubuntu:20.04     
+        args:
+        - "./scripts/check.sh"
+
+        volumeMounts:
+        - name: ubuntu-volume
+          mountPath: /usr/share/nginx/html
+
+        
+        - name: script-volume
+          mountPath: /scripts
+          
+
+
+      volumes:
+      - name: ubuntu-volume
+        persistentVolumeClaim:
+          claimName: ubuntu-pvc
+
+      - name: script-volume
+        configMap:
+          name: script-volume
+          defaultMode: 0777
+
+
+  ```

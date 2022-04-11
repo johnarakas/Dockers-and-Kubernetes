@@ -8,18 +8,9 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ubuntu-pvc1
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
----
+
 
 apiVersion: v1
 kind: Service
@@ -34,46 +25,104 @@ spec:
 
 
 ---
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: script-volume
 data:
+  check.sh:  |
+    #!/bin/bash   
+
+    cd /usr/share/nginx/html
+
+    while true
+    do
+      sleep 10
+      
+      if [[ -f index.html ]]
+      then
+        echo "index is exist!"
+        break;
+      else
+        echo "index is not exist!"
+      fi
+
+        
+    done
+    # sleep infinity
   script.sh: |
     #!/bin/bash
-    rm -rf /usr/share/nginx/html
+
+    rm -rfv /usr/share/nginx/html/*
 
     apt-get update
     apt-get install git -y
     apt-get install curl -y
     cd ../
-    git clone --recurse-submodules https://github.com/chazapis/hy548.git
+    git clone --recurse-submodules https://github.com/chazapis/hy548
     curl -L https://github.com/gohugoio/hugo/releases/download/v0.96.0/hugo_extended_0.96.0_Linux-64bit.deb -o hugo.deb
     apt install ./hugo.deb
-    hugo version 
+    hugo version
+
+
+  
     cd  hy548
     cd html
     hugo -D
-    cp -r public/. /scripts1/
+    diff -q public/  /usr/share/nginx/html/ 1>/dev/null
 
-  check.sh: |
-    #!/bin/bash
 
-    echo "hey"   
-
-    sleep 120
-
-    diff -q /scripts1/  /usr/share/nginx/html/ 1>/dev/null
     if [[ $? == "0" ]]
     then
       echo "The same"
     else
       echo "Not the same"
-      cp -r /scripts1/. /usr/share/nginx/html/
+      cp -r public/. /usr/share/nginx/html/
     fi
-    
+
+
+
+
+
+    # sleep infinity
+
 
 ---
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ask4
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: ubuntu
+        image: ubuntu:20.04     
+        args:
+        - "./scripts/script.sh"
+
+        volumeMounts:
+        - name: ubuntu-volume
+          mountPath: /usr/share/nginx/html
+
+
+        - name: script-volume
+          mountPath: /scripts
+
+      volumes:
+      - name: ubuntu-volume
+        persistentVolumeClaim:
+          claimName: ubuntu-pvc
+      - name: script-volume
+        configMap:
+          name: script-volume
+          defaultMode: 0777
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -93,8 +142,9 @@ spec:
         image: nginx:1.21.6
   
         volumeMounts:
-        - mountPath: /usr/share/nginx/html
-          name: ubuntu-volume
+        - name: ubuntu-volume
+          mountPath: /usr/share/nginx/html
+          
 
       initContainers:
       - name: ubuntu
@@ -110,8 +160,6 @@ spec:
         - name: script-volume
           mountPath: /scripts
           
-        - name: ubuntu-volume1
-          mountPath: /scripts1
 
 
       volumes:
@@ -119,45 +167,9 @@ spec:
         persistentVolumeClaim:
           claimName: ubuntu-pvc
 
-      - name: ubuntu-volume1
-        persistentVolumeClaim:
-          claimName: ubuntu-pvc1
-
       - name: script-volume
         configMap:
           name: script-volume
           defaultMode: 0777
 
----
 
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: ask4
-spec:
-  template:
-    spec:
-      restartPolicy: OnFailure
-      containers:
-      - name: ubuntu
-        image: ubuntu:20.04     
-        args:
-        - "./scripts/script.sh"
-
-        volumeMounts:
-        - name: script-volume
-          mountPath: /scripts
-        
-        - name: ubuntu-volume1
-          mountPath: /scripts1
-
-      volumes:
-
-      - name: ubuntu-volume1
-        persistentVolumeClaim:
-          claimName: ubuntu-pvc1
-
-      - name: script-volume
-        configMap:
-          name: script-volume
-          defaultMode: 0777
