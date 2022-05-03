@@ -36,6 +36,7 @@ app.run(debug=True,host='0.0.0.0', port=8080)
 
 To build my image :
 
+`docker build "hw3.1.1" . `
 
 To compile my code :
 
@@ -183,6 +184,9 @@ spec:
           value: /second
 ```
 
+### 1.3
+
+
 The commands for running are :
 
 ```
@@ -193,9 +197,11 @@ minikube addons enable ingress
 minikube apply -f first.yaml
 minikube apply -f first.yaml
 
-kubectl port-forward first-5c98c566db-vbxnr 8080:8080
+minikube tunnel
 
-kubectl port-forward second-85fdccf6d6-htb8t 8090:8080
+<!-- kubectl port-forward first-5c98c566db-vbxnr 8080:8080
+
+kubectl port-forward second-85fdccf6d6-htb8t 8090:8080 -->
 
 
 curl localhost:8080/first
@@ -300,3 +306,19 @@ For 100 users
 
 
 ![myindex_html](Assets/100users.png)
+
+
+## 3
+
+I didn't need to add something to my yaml the commands I used :
+
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install my-ingress-nginx ingress-nginx/ingress-nginx --version 4.1.0
+
+minikube start ...
+...
+
+
+```
