@@ -2,7 +2,7 @@
 
 ## 1
 
-### 1.1
+### 1a.
 
 My Docker file
 
@@ -49,9 +49,9 @@ To push my code :
 ` docker push johnarakas/homework3-1.1:homework3-1.1-tag `
 
 
-### 1.2 
+### 1.b
 
-My python file
+My new python file
 
 ```
 
@@ -199,13 +199,8 @@ minikube apply -f first.yaml
 
 minikube tunnel
 
-<!-- kubectl port-forward first-5c98c566db-vbxnr 8080:8080
-
-kubectl port-forward second-85fdccf6d6-htb8t 8090:8080 -->
-
-
-curl localhost:8080/first
-curl localhost:8090/second
+curl localhost:/first
+curl localhost:/second
 
 
 ```
