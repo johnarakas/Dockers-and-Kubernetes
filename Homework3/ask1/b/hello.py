@@ -3,7 +3,7 @@ import os
 app = Flask(__name__)
 
 
-@app.route(os.environ['ROUTE_PATH'])
+@app.route(os.environ['ROUTE'])
 
 def index():
     return os.environ['MESSAGE']

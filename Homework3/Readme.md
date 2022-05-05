@@ -308,6 +308,7 @@ For 100 users
 I didn't need to add something to my yaml the commands I used :
 
 ```
+minikube addons disable ingress
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm install my-ingress-nginx ingress-nginx/ingress-nginx --version 4.1.0
