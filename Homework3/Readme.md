@@ -287,9 +287,13 @@ spec:
 
 ```
 
-
-
 Using locust I run benchmarks for 1 nad 100 user/s
+
+Using 1 user 1 container only start.
+
+Using 100 users 4 containers start.
+
+
 
 For 1 user
 
@@ -305,7 +309,31 @@ For 100 users
 
 ## 3
 
-I didn't need to add something to my yaml the commands I used :
+I only change the ingress to:
+
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flask-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /hello
+        pathType: Prefix
+        backend:
+          service:
+            name: flask
+            port:
+              number: 8080
+
+```
+
+The commands that I used was: 
 
 ```
 minikube addons disable ingress
@@ -314,7 +342,12 @@ helm repo update
 helm install my-ingress-nginx ingress-nginx/ingress-nginx --version 4.1.0
 
 minikube start ...
-...
+
+kubectl apply -f first.yaml
+
+minikube tunel
 
 
 ```
+
+## 4

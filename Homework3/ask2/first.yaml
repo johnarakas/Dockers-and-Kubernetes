@@ -64,9 +64,9 @@ spec:
         image: johnarakas/hw:hw-tag
         env:
         - name: MESSAGE
-          value: "This is the first service"
+          value: "This is the third service"
         - name: ROUTE
-          value: /first
+          value: /third
         resources:
           limits:
             cpu: "200m"
