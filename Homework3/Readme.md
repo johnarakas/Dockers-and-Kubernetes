@@ -351,3 +351,8 @@ minikube tunel
 ```
 
 ## 4
+
+All the files are located in /ask4
+
+
+`helm install johnchart my-chart/ --set commands.route=third --set commands.message="this is the third service" --set resources.limits.cpu=25m --set autoscaling.maxReplicas=20`
