@@ -309,50 +309,19 @@ For 100 users
 
 ## 3
 
-I only change the ingress to:
+I edit my load balancer (nginx-ingress-ingress-nginx-controller) and I add the minikube ip as  external ip
+It still does not work.
 
+My yaml file stay the same
 
-```
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: flask-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /hello
-        pathType: Prefix
-        backend:
-          service:
-            name: flask
-            port:
-              number: 8080
-
-```
-
-The commands that I used was: 
-
-```
-minikube addons disable ingress
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
-helm install my-ingress-nginx ingress-nginx/ingress-nginx --version 4.1.0
-
-minikube start ...
-
-kubectl apply -f first.yaml
-
-minikube tunel
-
-
-```
+`
 
 ## 4
 
 All the files are located in /ask4
 
+Again the ingress is not working, using port fowrward the containers open normally.
+
+To run the helm chart run: 
 
 `helm install johnchart my-chart/ --set commands.route=third --set commands.message="this is the third service" --set resources.limits.cpu=25m --set autoscaling.maxReplicas=20`
