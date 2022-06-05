@@ -50,17 +50,14 @@ spec:
                 count:
                   type: integer
                 grams:
-                  type: string
+                  type: integer
   preserveUnknownFields: false
+
 
 
 ```
 
 the commands are : 
-
-`minikube start --kubernetes-version=1.22.4`
-
-`kubectl apply -f fruit-crd.yaml`
 
 `python3 -m venv venv`
 
@@ -68,7 +65,13 @@ the commands are :
 
 `pip install -r requirements.txt`
 
+`minikube start --kubernetes-version=1.22.4`
+
+`kubectl apply -f fruit-crd.yaml`
+
 `kubectl apply -f fruits.yaml`
+
+`kubectl get fruits apple - o yaml `
 
 `kubectl get fruits`
 
@@ -77,15 +80,56 @@ the commands are :
 
 ### 2.a
 
-greeting-controller.yaml
+my docker file
 
 ```
-apiVersion: extensions/v1beta1
+FROM python:3.9-slim-bullseye
+
+RUN python3 -m venv /opt/venv
+
+COPY requirements.txt .
+RUN . /opt/venv/bin/activate && pip install -r requirements.txt
+
+
+
+COPY kubeclient.py .
+COPY controller.py .    
+
+RUN apt-get update -y
+RUN apt-get install curl -y
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+RUN chmod +x ./kubectl
+RUN mv ./kubectl /usr/local/bin
+
+CMD . /opt/venv/bin/activate && exec python controller.py
+
+```
+
+for building the image:
+
+`docker build -t john .`
+
+for pushing the image:
+
+`docker  tag john johnarakas/john:latest`
+
+`docker push johnarakas/john:latest`
+
+
+### 2.b
+
+fruit-controller.yaml
+
+```
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: k8s-101
 spec:
-  replicas: 3
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: k8s-101
   template:
     metadata:
       labels:
@@ -95,7 +139,7 @@ spec:
       containers:
       - name: k8s-101
         imagePullPolicy: Always
-        image: salathielgenese/k8s-101
+        image: johnarakas/john:latest
         ports:
         - name: app
           containerPort: 3000
@@ -117,5 +161,18 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: k8s-101-role
-  
+
 ```
+to run my controller :
+
+`kubectl apply -f fruit-controller.yaml `
+
+to check my controller :
+
+`docker get all`
+
+`docker get pods`
+
+`docker describe pod ...`
+
+

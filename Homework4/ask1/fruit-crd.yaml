@@ -26,5 +26,5 @@ spec:
                 count:
                   type: integer
                 grams:
-                  type: string
+                  type: integer
   preserveUnknownFields: false

@@ -1,9 +1,12 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: k8s-101
 spec:
-  replicas: 3
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: k8s-101
   template:
     metadata:
       labels:
@@ -13,7 +16,7 @@ spec:
       containers:
       - name: k8s-101
         imagePullPolicy: Always
-        image: salathielgenese/k8s-101
+        image: johnarakas/john:latest
         ports:
         - name: app
           containerPort: 3000
